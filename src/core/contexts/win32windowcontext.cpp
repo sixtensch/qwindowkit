@@ -536,7 +536,11 @@ namespace QWK {
                     // https://github.com/qt/qtbase/blob/e26a87f1ecc40bc8c6aa5b889fce67410a57a702/src/plugins/platforms/windows/qwindowscontext.cpp#L1546
                     // Qt needs to refer to the WM_NCCALCSIZE message data that hasn't been
                     // processed, so we have to process it after Qt acquires the initial data.
-                    if (lastMessageContext) {
+                    // The context stays set while the managed window's message is dispatched,
+                    // which is when Qt moves native child windows and sends them their own
+                    // WM_NCCALCSIZE. Those must keep their default client area.
+                    if (lastMessageContext &&
+                        reinterpret_cast<HWND>(lastMessageContext->windowId()) == msg->hwnd) {
                         LRESULT res;
                         if (lastMessageContext->nonClientCalcSizeHandler(
                                 msg->hwnd, msg->message, msg->wParam, msg->lParam, &res)) {
