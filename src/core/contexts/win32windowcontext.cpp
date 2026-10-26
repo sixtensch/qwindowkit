@@ -2342,13 +2342,14 @@ namespace QWK {
             // On Windows 11, DWM draws a visible frame border at the top of every thick-frame
             // window (DWMWA_VISIBLE_FRAME_BORDER_THICKNESS, typically 1 physical pixel). That
             // border ends up painted on top of the client area, covering the top of the content.
-            // So we shift the clientRect accordingly. This only applies when the window is not
-            // maximized or full-screen.
+            // So we move the top of the clientRect below it. This only applies when the window is
+            // not maximized or full-screen. The bottom stays where the default frame put it: Qt
+            // infers the top margin from the window and client heights, assuming the bottom margin
+            // matches the left and right ones, and setting a geometry misses by the border otherwise.
             if (isWin11OrGreater() && !max && !full) {
                 int size = getWindowFrameBorderThickness(hWnd);
 
                 clientRect->top += size;
-                clientRect->bottom += size;
             }
         }
 
